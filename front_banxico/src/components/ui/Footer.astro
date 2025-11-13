@@ -1,0 +1,180 @@
+<footer class="site-footer">
+  <div class="footer-top-bar"></div>
+  
+  <div class="footer-content">
+    <div class="footer-columns">
+      
+      <div class="footer-column">
+        <section class="footer-section">
+          <h3>PREGUNTAS FRECUENTES</h3>
+          <ul>
+            <li><a href="#">Preguntas frecuentes</a></li>
+          </ul>
+        </section>
+
+        <section class="footer-section">
+          <h3>ACCESIBILIDAD</h3>
+          <ul>
+            <li><a href="#">Accesibilidad</a></li>
+          </ul>
+        </section>
+      </div>
+
+      <div class="footer-column">
+        <section class="footer-section">
+          <h3>AVISOS</h3>
+          <ul>
+            <li><a href="#">Información sobre la existencia de comunicaciones fraudulentas y páginas de internet apócrifas</a></li>
+          </ul>
+        </section>
+
+        <section class="footer-section">
+          <h3>DOMICILIO LEGAL</h3>
+          <p>
+            <i class="fa-solid fa-location-dot"></i> 
+            <a href="#">Avenida 5 de Mayo 2, Colonia Centro, Código postal 06000, Alcaldía Cuauhtémoc, Ciudad de México, México</a>
+          </p>
+        </section>
+      </div>
+
+      <div class="footer-column">
+        <section class="footer-section">
+          <h3>REDES SOCIALES</h3>
+          <ul>
+            <li><i class="fa-brands fa-x-twitter"></i> <a href="#">Banco de México</a></li>
+            <li><i class="fa-brands fa-x-twitter"></i> <a href="#">EmisiónBanxico</a></li>
+            <li><i class="fa-brands fa-x-twitter"></i> <a href="#">Banxico Educa</a></li>
+            <li><i class="fa-brands fa-facebook-f"></i> <a href="#">BancodeMéxico</a></li>
+            <li><i class="fa-brands fa-facebook-f"></i> <a href="#">Banxico Educa</a></li>
+            <li><i class="fa-brands fa-instagram"></i> <a href="#">Banco de México</a></li>
+            <li><i class="fa-brands fa-linkedin-in"></i> <a href="#">Banco de México</a></li>
+            <li><i class="fa-brands fa-youtube"></i> <a href="#">Banco de México</a></li>
+          </ul>
+        </section>
+      </div>
+
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* --- Configuración Global --- */
+  :root {
+    --footer-text: #333;
+    --footer-link: #005a89;
+    --footer-heading: #008080; 
+    --footer-bg: #f8f8f8;
+    --footer-border: #ddd;
+    --footer-top-bar-color: #005a89; /* Color que pediste */
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0; 
+  }
+
+  /* --- Estructura del Footer --- */
+  .site-footer {
+    position: relative;
+    background-color: var(--footer-bg);
+    color: var(--footer-text);
+    padding: 100px 20px 30px 20px; 
+    border-top: 1px solid var(--footer-border);
+    font-size: 14px;
+  }
+
+  /* --- Barra Superior --- */
+  .footer-top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background-color: var(--footer-top-bar-color);
+  }
+
+  /* --- Contenido y Columnas --- */
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .footer-columns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .footer-column {
+    flex: 1;
+    min-width: 280px;
+  }
+
+  /* --- Secciones Internas --- */
+  .footer-section {
+    margin-bottom: 25px;
+  }
+
+  .footer-section h3 {
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--footer-heading);
+    margin-top: 0;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--footer-border);
+  }
+
+  /* --- Listas y Enlaces --- */
+  .footer-section ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer-section li {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .footer-section a {
+    color: var(--footer-link);
+    text-decoration: none;
+  }
+
+  .footer-section a:hover {
+    text-decoration: underline;
+  }
+
+  /* --- (DOMICILIO) --- */
+  .footer-section p {
+    margin: 0;
+    line-height: 1.6;
+    display: flex;
+    gap: 8px;
+  }
+
+  .footer-section p a {
+    display: inline;
+  }
+  
+  /* --- NUEVO: Estilos para los íconos <i> --- */
+  .footer-section i {
+    color: var(--footer-link); /* Color del ícono */
+    width: 20px; /* Ancho fijo para alinear el texto */
+    text-align: center;
+    /* Evita que el ícono sea diminuto */
+    font-size: 16px; 
+  }
+
+  /* Ajuste para el pin de domicilio */
+  .footer-section p i {
+    padding-top: 4px; 
+    align-self: flex-start;
+  }
+</style>

@@ -1,0 +1,55 @@
+---
+// No props needed for size anymore
+---
+
+<div class="card">
+  <div class="text-content">
+    <div><slot /></div>
+  </div>
+</div>
+
+<style>
+  .text-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Añadido para centrar verticalmente */
+    gap: 0.5rem; /* Espacio entre h1 y h2 */
+  }
+
+  .card {
+    width: 100%; /* Ocupa el ancho de su contenedor */
+    height: auto; /* La altura se ajusta al contenido */
+    border-radius: 1rem;
+
+    /* Gradiente con tu paleta */
+    
+
+    /* Sombras elegantes estilo neumorphism */
+    box-shadow:
+      rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset,
+      rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset,
+      rgba(0, 0, 0, 0.10) 0px -79px 40px 0px inset,
+      rgba(0, 0, 0, 0.06) 0px 2px 1px,
+      rgba(0, 0, 0, 0.09) 0px 4px 2px,
+      rgba(0, 0, 0, 0.09) 0px 8px 4px,
+      rgba(0, 0, 0, 0.09) 0px 16px 8px,
+      rgba(0, 0, 0, 0.09) 0px 32px 16px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: rgb(255, 255, 255);
+    font-weight: 600;
+    text-align: center;
+    padding: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    background-color: rgb(34, 29, 66);
+  }
+
+  .card:hover {
+    transform: scale(1.05);
+  }
+</style>

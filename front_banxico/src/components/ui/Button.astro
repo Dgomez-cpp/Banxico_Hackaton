@@ -1,0 +1,58 @@
+---
+interface Props {
+  href?: string;
+  class?: string;
+}
+const { href, class: className } = Astro.props;
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag class:list={["custom-button", className]} href={href}>
+  <slot />
+</Tag>
+
+<style>
+  .custom-button {
+    width: 9em;
+    height: 3em;
+    border-radius: 30em;
+    font-size: 15px;
+    font-family: inherit;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    box-shadow: 6px 6px 12px #c5c5c5,
+                -6px -6px 12px #ffffff;
+    
+    /* Added for content alignment and link styling */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    color: #111827; /* Default text color */
+    transition: color 0.4s ease-in-out;
+  }
+
+  .custom-button:hover {
+    color: rgb(255, 255, 255); /* Text color on hover */
+  }
+
+  .custom-button::before {
+    content: '';
+    width: 0;
+    height: 3em;
+    border-radius: 30em;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-image: linear-gradient(to right, var(--color4) 0%, var(--color5) 100%);
+    transition: width 0.4s ease-in-out;
+    display: block;
+    z-index: -1;
+  }
+
+  .custom-button:hover::before {
+    width: 9em;
+  }
+</style>

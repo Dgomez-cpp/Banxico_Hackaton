@@ -1,0 +1,26 @@
+---
+import Card from "../components/ui/Card.astro";
+import Layout from "../layouts/Layout.astro";
+Layout
+---
+<main style="display:flex;gap:20px;padding:2rem;">
+  <Card
+    bankName="Banco Ejemplo"
+    personName="DIEGO GOMEZ"
+    number="1234 5678 9012 3456"
+    expiry="12/27"
+    code="123"
+    photo="/src/assets/Banxico_logo.svg"
+    debitLabel="DEBIT"
+  />
+
+  <Card
+    bankName="Universal Bank"
+    personName="MARÍA PÉREZ"
+    number="XXXX XXXX XXXX 0000"
+    expiry="07/26"
+    code="999"
+    photo=""
+    debitLabel="DEBIT"
+  />
+</main>

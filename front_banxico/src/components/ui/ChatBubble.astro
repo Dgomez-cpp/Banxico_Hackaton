@@ -1,0 +1,181 @@
+<div class="chat-bubble-container">
+  <button id="chat-bubble-toggle" class="chat-bubble" aria-label="Abrir chat">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+  </button>
+
+  <div id="chat-window-popup" class="chat-window-popup" style="display: none;">
+    <div class="chat-header">
+      Asistente Banxico
+      <button id="chat-close-btn" class="chat-close" aria-label="Cerrar chat">&times;</button>
+    </div>
+    <div id="chat-messages" class="chat-messages">
+      <div class="message bot">Hola, soy tu asistente. ¿En qué te ayudo? (ej: "cuál es mi saldo")</div>
+    </div>
+    <form id="chat-form-popup" class="chat-form-popup">
+      <input type="text" id="chat-input-popup" placeholder="Escribe tu mensaje..." autocomplete="off" />
+      <button type="submit" aria-label="Enviar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Esta lógica se ejecuta en el cliente
+  const toggleBtn = document.getElementById('chat-bubble-toggle');
+  const chatWindow = document.getElementById('chat-window-popup');
+  const closeBtn = document.getElementById('chat-close-btn');
+  const chatForm = document.getElementById('chat-form-popup');
+  const chatInput = document.getElementById('chat-input-popup') as HTMLInputElement;
+  const chatMessages = document.getElementById('chat-messages');
+
+  // Abrir y cerrar el chat
+  toggleBtn.addEventListener('click', () => {
+    chatWindow.style.display = 'flex';
+    toggleBtn.style.display = 'none';
+  });
+
+  closeBtn.addEventListener('click', () => {
+    chatWindow.style.display = 'none';
+    toggleBtn.style.display = 'flex';
+  });
+
+  // Manejar el envío de mensajes
+  chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const message = chatInput.value.trim();
+    if (!message) return;
+
+    addMessage(message, 'user');
+    chatInput.value = '';
+
+    // Llama al "puente" seguro de Astro
+    try {
+      const res = await fetch('/api/assist', { // ❗️ Llama al nuevo "puente"
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message })
+      });
+
+      if (!res.ok) {
+        // Maneja errores de sesión (ej. si el token expiró)
+        if (res.status === 401) {
+          addMessage('Tu sesión ha expirado. Por favor, inicia sesión de nuevo.', 'bot error');
+          return;
+        }
+        throw new Error('Error del servidor');
+      }
+
+      const data = await res.json();
+      addMessage(data.response, 'bot');
+
+    } catch (err) {
+      addMessage('Lo siento, no pude conectarme con el asistente.', 'bot error');
+    }
+  });
+
+  function addMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', sender);
+    msgDiv.textContent = text;
+    chatMessages.appendChild(msgDiv);
+    // Auto-scroll
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+</script>
+
+<style>
+  .chat-bubble-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+  }
+  .chat-bubble {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: var(--color3); /* Usa tu variable de color */
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .chat-window-popup {
+    width: 350px;
+    height: 500px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .chat-header {
+    background: var(--color3);
+    color: white;
+    padding: 1rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chat-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  .chat-messages {
+    flex-grow: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: #f4f4f4;
+  }
+  .message {
+    padding: 0.6rem 0.8rem;
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    max-width: 90%;
+    color: black;
+  }
+  .message.user {
+    background: var(--color4);
+    color: white;
+    margin-left: auto;
+  }
+  .message.bot {
+    background: #e5e5e5;
+  }
+  .message.bot.error {
+    background: #f8d7da;
+    color: #721c24;
+  }
+  .chat-form-popup {
+    display: flex;
+    padding: 0.5rem;
+    border-top: 1px solid #ddd;
+  }
+  #chat-input-popup {
+    flex-grow: 1;
+    border: none;
+    padding: 0.75rem;
+    background: transparent;
+  }
+  #chat-input-popup:focus {
+    outline: none;
+  }
+  .chat-form-popup button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    color: var(--color3);
+  }
+</style>

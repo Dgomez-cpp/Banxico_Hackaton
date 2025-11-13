@@ -1,0 +1,81 @@
+---
+import LogoUrl from "../../assets/Banxico_logo.svg?url";
+import Input from "./Input.astro";
+import Button from "./Button.astro";
+
+export interface Props {
+  title?: string;
+  subtitle?: string;
+  action?: string;
+}
+
+const t = {
+  title: "Realizar Pago",
+  subtitle: "Por favor, ingrese los detalles del pago",
+  sourceAccountPlaceholder: "Cuenta de Origen",
+  destinationAccountPlaceholder: "Número de Tarjeta de Destino", // <-- CAMBIO AQUÍ,
+  amountPlaceholder: "Monto",
+  referencePlaceholder: "Referencia",
+  payButton: "Pagar",
+  banxicoLogoAlt: "Logo de Banxico",
+};
+
+const {
+  title = t.title,
+  subtitle = t.subtitle,
+  action = "/api/payment"
+} = Astro.props as Props;
+---
+<div class="u-payment-root">
+  <div class="u-payment-container">
+    <div class="u-header">
+      <img src={LogoUrl} alt={t.banxicoLogoAlt} class="u-logo" />
+    </div>
+
+    <div class="u-heading">{title}</div>
+    <p class="u-sub">{subtitle}</p>
+
+    <form class="u-form" method="POST" action={action}>
+      <Input type="text" name="numeroTarjeta" placeholder={t.destinationAccountPlaceholder} />
+      <Input type="number" name="monto" placeholder={t.amountPlaceholder} />
+      <Input type="text" name="referencia" placeholder={t.referencePlaceholder} />
+
+      <Button type="submit" class="payment-button">{t.payButton}</Button>
+    </form>
+  </div>
+</div>
+
+<style>
+  .u-payment-root { display:flex; align-items:center; justify-content:center; padding: 2rem; }
+  .u-payment-container {
+    max-width: 500px;
+    background: linear-gradient(0deg, rgb(255,255,255) 0%, rgb(244,247,251) 100%);
+    border-radius: 24px;
+    padding: 22px 26px;
+    border: 4px solid rgb(255,255,255);
+    box-shadow: rgba(133,189,215,0.88) 0px 30px 30px -20px;
+    margin: 20px;
+    text-align: center;
+  }
+
+  .u-header { display:flex; justify-content:center; margin-bottom: 6px; }
+  .u-logo { width:92px; height:auto; display:block; margin: 0 auto; }
+
+  .u-heading {
+    font-weight: 900;
+    font-size: 1.6rem;
+    color: var(--color3);
+    margin-top: 6px;
+  }
+  .u-sub {
+    font-size: 0.95rem;
+    margin: 6px 0 12px 0;
+    color: var(--muted);
+  }
+
+  .u-form { margin-top: 6px; display:flex; flex-direction:column; gap:15px; }
+  
+  .payment-button {
+    margin-top: 15px;
+  }
+</style>

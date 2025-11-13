@@ -1,0 +1,270 @@
+---
+// === IMPORTS DE COMPONENTES ===
+import Layout from "../layouts/Layout.astro";
+import Card from "../components/ui/Card.astro";
+import CardView from "../components/ui/CardView.astro";
+import Button from "../components/ui/Button.astro";
+import LoginForm from "../components/ui/LoginForm.astro"; // Importamos el Login
+
+// === IMPORTS DE LÓGICA DE SESIÓN ===
+import jwt from 'jsonwebtoken';
+import type { JwtPayload } from 'jsonwebtoken';
+
+// ❗️ IMPORTANTE: Usa la misma clave secreta que en tu backend
+const SECRET_KEY = 'banxico'; 
+
+export const prerender = false;
+
+// === LÓGICA DE VERIFICACIÓN DE SESIÓN (REQ 1) ===
+const token = Astro.cookies.get('session')?.value;
+let usuario: (JwtPayload & { id: number, nombre: string, rol: string, correo: string }) | null = null;
+let usuarioCorreo: (JwtPayload & { id: number, nombre: string, rol: string, correo: string }) | null = null;
+
+
+// === NUEVA LÓGICA (REQ 3): Preparamos las variables para la cuenta ===
+let cuenta: { saldo: number, moneda: string } | null = null;
+let saldoFormateado: string | null = null;
+let tarjeta: {
+  banco: string,
+  titular: string,
+  numeroTarjeta: string,
+  fechaExpiracion: string,
+  logo: string,
+  pin:number,
+  tipo: string
+} | null = null;
+
+if (token) {
+  try {
+    // Verificamos el token
+    const decoded = jwt.verify(
+      token, 
+      SECRET_KEY
+    ) as (JwtPayload & { id: number, nombre: string, rol: string });
+    
+    // Si es válido, tenemos al usuario
+    usuario = decoded;
+    // === NUEVA LÓGICA (REQ 3): Si el usuario es válido, buscamos su cuenta ===
+    try {
+      // Hacemos el fetch (servidor a servidor)
+      const resCuenta = await fetch(`http://localhost:3000/cuentas/balance/${usuario.id}`);
+      
+      if (resCuenta.ok) {
+        const cuentasData = await resCuenta.json(); // Tu backend devuelve un array (recordset)
+        
+        if (cuentasData && cuentasData.length > 0) {
+          cuenta = cuentasData[0]; // Tomamos la primera cuenta
+
+          // Formateamos el saldo para mostrarlo bonito
+          saldoFormateado = new Intl.NumberFormat('es-MX', {
+            style: 'currency',
+            currency: cuenta?.moneda || 'MXN'
+          }).format(cuenta!.saldo);
+        } else {
+          // El usuario existe pero aún no tiene cuenta
+          console.warn(`Usuario ${usuario.id} no tiene cuenta bancaria registrada.`);
+          saldoFormateado = "No disponible";
+        }
+      } else {
+        console.error(`Error ${resCuenta.status} al buscar la cuenta del usuario ${usuario.id}.`);
+      }
+    } catch (e) {
+      console.error("Error de conexión con el backend (cuentas):", e.message);
+    }
+
+    const resUsuario = await fetch(`http://localhost:3000/usuario/${usuario.id}`);
+    if(resUsuario.ok){
+      const usuarioData = await resUsuario.json();
+      usuarioCorreo = usuarioData;
+    }
+
+
+    
+    // === NUEVA LÓGICA (TARJETA): Fetch de la Tarjeta ===
+    try {
+      // Asumiendo que tu ruta de backend es /tarjetas/usuario/:idUsuario
+      const resTarjeta = await fetch(`http://localhost:3000/tarjeta/usuario/${usuario.id}`);
+      
+      if (resTarjeta.ok) {
+        const tarjetasData = await resTarjeta.json(); // Tu backend devuelve un array
+        
+        if (tarjetasData && tarjetasData.length > 0) {
+          // Tomamos la primera tarjeta para mostrarla en el Card
+          tarjeta = tarjetasData[0]; 
+        } else {
+          console.warn(`Usuario ${usuario.id} no tiene tarjetas registradas.`);
+        }
+      } else {
+        console.error(`Error ${resTarjeta.status} al buscar la tarjeta del usuario ${usuario.id}.`);
+      }
+    } catch (e) {
+      console.error("Error de conexión con el backend (tarjetas):", e.message);
+    }
+  } catch (error) {
+    // Si es inválido (expirado, etc.), lo borramos
+    console.error("Token inválido o expirado");
+    Astro.cookies.delete('session', { path: '/' });
+  }
+}
+
+// (Para mostrar errores si falla el login)
+const error = Astro.url.searchParams.get('error');
+---
+
+<Layout title={usuario ? `Dashboard de ${usuario.nombre}` : "Iniciar Sesión"}>
+
+  {/* RENDERIZADO CONDICIONAL: 
+    Esto decide qué mostrar basado en si 'usuario' existe
+  */}
+
+  {usuario ? (
+    <main>
+      <div class="card-container">
+        <Card
+          bankName={tarjeta ? tarjeta.banco : "BANXICO"}
+          personName={tarjeta ? tarjeta.titular : usuario.nombre.toUpperCase()}
+          number={tarjeta ? tarjeta.numeroTarjeta : "---- ---- ---- ----"}
+          expiry={tarjeta ? tarjeta.fechaExpiracion : "--/--"}
+          code={tarjeta ? tarjeta.pin : "XXX"} photo={tarjeta ? tarjeta.logo : "/src/assets/Banxico_logo.svg"}
+          debitLabel={tarjeta ? tarjeta.tipo : "DEBIT"}
+        /> 
+        <CardView width="700px" height="254px">
+          <h1>Bienvenido a Banxico</h1>
+          <h2>{usuario.nombre.toUpperCase()}</h2> </CardView>
+      </div>
+
+      <div class="info-container">
+        <CardView width="420px">
+          <div class="info-card-content">
+            <h3>Información de la Cuenta</h3>
+            <div class="user-info">
+              <p><strong>Nombre:</strong><span>{usuario.nombre}</span></p>
+              <p><strong>Correo:</strong><span>{usuarioCorreo?.correo}</span></p>
+              <hr />
+              <p><strong>Saldo Actual:</strong><span>{cuenta?.saldo}</span></p> </div>
+              <p><strong>Cuenta en:</strong><span>{cuenta?.moneda}</span></p>
+          </div>
+        </CardView>
+
+        <CardView width="420px">
+          <div class="actions-card-content">
+            <h3>Acciones Rápidas</h3>
+            <div class="actions">
+              <Button href="/pagos" class="index-btn">Realizar un Pago</Button>
+              <Button href="/instrumentos" class="index-btn">Inversiones</Button>
+            </div>
+          </div>
+        </CardView>
+      </div>
+
+      <div class="logout-container">
+        <a href="/api/logout" class="logout-button">Cerrar Sesión</a>
+      </div>
+    </main>
+    
+  ) : (
+    
+    <main style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 20px); flex-direction: column;">
+      
+      {error && (
+        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #f5c6cb;">
+          {error}
+        </div>
+      )}
+      
+      <LoginForm action="/api/auth" />
+    </main>
+  )}
+</Layout>
+
+<style>
+  main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    gap: 2rem;
+    padding: 2rem 1rem;
+  }
+  .card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .info-container {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 20px;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 1144px; /* Matches width of top container */
+  }
+
+  .info-card-content,
+  .actions-card-content {
+    width: 100%;
+    padding: 1rem;
+
+  }
+
+  .user-info {
+    text-align: left;
+  }
+  .user-info p {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.8rem 0;
+    font-size: 0.95rem;
+  }
+  .user-info hr {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 1rem 0;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    align-items: center;
+  }
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+    text-align: center;
+    color: var(--color5);
+  }
+
+  .actions :global(.index-btn) {
+    color: white;
+  }
+  
+  /* === ESTILOS AÑADIDOS === */
+  .logout-container {
+    width: 100%;
+    max-width: 1144px;
+    text-align: right;
+  }
+  
+  .logout-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #dc3545;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+  }
+  .logout-button:hover {
+    background-color: #c82333;
+  }
+</style>

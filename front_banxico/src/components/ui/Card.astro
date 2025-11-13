@@ -1,0 +1,291 @@
+---
+export interface Props {
+  bankName?: string;
+  personName?: string;
+  number?: string;
+  expiry?: string;
+  code?: string;
+  photo?: string; // url relative to /src/assets or public
+  debitLabel?: string;
+  ariaLabel?: string;
+  variant?: 'default' | 'dark';
+}
+
+const {
+  bankName = "Universal Bank",
+  personName = "PAVLO MATVIIENKO",
+  number = "XXXX XXXX XXXX XXXX",
+  expiry = "XX/XX",
+  code = "XXX",
+  photo = "",
+  debitLabel = "debit",
+  ariaLabel = "Tarjeta bancaria",
+  variant = "dark"
+} = Astro.props as Props;
+---
+<figure class="card" role="figure" aria-label={ariaLabel}>
+  <div class={`card__side card__side_front ${variant === 'dark' ? 'is-dark' : ''}`}>
+    <div class="flex__1">
+      <p class="card__side__name-bank">{bankName}</p>
+      <div class="card__side__chip" aria-hidden="true"></div>
+      <p class="card__side__name-person">{personName}</p>
+    </div>
+  </div>
+
+  <div class="card__side card__side_back">
+    <div class="card__side__black" aria-hidden="true"></div>
+
+    <p class="card__side__number" aria-hidden="true">{number}</p>
+
+    <div class="flex__2" aria-hidden="true">
+      <p class="card__side__other-numbers card__side__other-numbers_1">{expiry}</p>
+      <p class="card__side__other-numbers card__side__other-numbers_2">{code}</p>
+
+      {photo ? (
+        <div class="card__side__photo" style={`background-image: url('${photo}'); background-size:cover; background-position:center;`} role="img" aria-label="Foto"></div>
+      ) : (
+        <div class="card__side__photo" aria-hidden="true"></div>
+      )}
+
+      <div class="card__side__debit" aria-hidden="true">{debitLabel}</div>
+    </div>
+
+    <p class="card__side__other-info" aria-hidden="true">
+      {} 
+    </p>
+  </div>
+</figure>
+
+<style>
+  /* Component-scoped styles for the card (based on the design) */
+  .flex__1 {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+  }
+
+  .flex__2 {
+    width: 100%;
+    height: 50%;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .card {
+    height: 210px; /* approximate mm -> px for screens */
+    width: 320px;
+    position: relative;
+    perspective: 800px;
+    display: inline-block;
+  }
+
+  .card__side {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    backface-visibility: hidden;
+    transition: transform 0.7s ease-out;
+    cursor: pointer;
+    padding: 12px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .card__side__photo {
+    width: 56px;
+    height: 56px;
+    position: absolute;
+    left: 12px;
+    bottom: 15px;
+    background: rgb(240, 239, 239);
+    border-radius: 8%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+  }
+
+  .card__side_front {
+    background: linear-gradient(90deg, rgb(0,0,0) 0%, #242424 100%);
+    transform: rotateY(0deg);
+  }
+
+  /* allow a lighter variant if wanted */
+  .card__side_front.is-dark {
+    background: linear-gradient(90deg, #0b1220 0%, #1b2430 100%);
+  }
+
+  .card__side_back {
+    background: linear-gradient(-90deg, rgb(0,0,0) 0%, #242424 100%);
+    transform: rotateY(-180deg);
+    color: #eeeeee;
+  }
+
+  .card__side__name-bank {
+    font-family: Inter, sans-serif;
+    font-weight: 600;
+    position: relative;
+    font-size: 18px;
+    margin-left: 8px;
+    color: white;
+  }
+
+  .card__side__name-bank::after {
+    content: "Universal Bank";
+    position: absolute;
+    font-size: 10px;
+    top: 105%;
+    left: 21%;
+    color: #635c77;
+  }
+
+  .card__side__name-bank::before {
+    content: "₴";
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: #635c77;
+  }
+
+  .card__side__chip {
+    width: 48px;
+    height: 36px;
+    margin-left: 22px;
+    margin-top: -20px;
+    background: rgb(226,175,35);
+    border-radius: 8px;
+    position: relative;
+  }
+
+  .card__side__name-person {
+    text-transform: uppercase;
+    font-family: "Roboto Mono", monospace;
+    font-size: 13px;
+    margin-bottom: 10px;
+    margin-left: 20px;
+    position: relative;
+    display: block;
+    color: white;
+  }
+
+  .card__side__name-person::before {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 45px;
+    aspect-ratio: 1 / 1;
+    background: red;
+    bottom: -10px;
+    right: 0px;
+    border-radius: 50%;
+  }
+
+  .card__side__name-person::after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 45px;
+    aspect-ratio: 1 / 1;
+    background: orange;
+    bottom: -10px;
+    right: 23px;
+    border-radius: 50%;
+  }
+
+  .card__side__black {
+    background: black;
+    width: 100%;
+    height: 50px;
+    border-radius: 12px 12px 0 0;
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .card__side__number {
+    font-size: 16px;
+    font-family: "Roboto Mono", monospace;
+    color: #eeeeee;
+    margin: 55px 0 15px 10px;
+  }
+
+  .card__side__other-numbers {
+    font-family: "Roboto Mono", monospace;
+    color: #eeeeee;
+    display: block;
+    margin-left: 10px;
+    font-size: 12px;
+    backface-visibility: hidden;
+    position: relative;
+  }
+
+  .card__side__other-numbers::after {
+    color: #635c77;
+    position: absolute;
+    font-size: 10px;
+    left: 0;
+    bottom: 60px;
+  }
+
+  .card__side__other-numbers_1::after { content: ""; }
+  .card__side__other-numbers_2::after { content: ""; }
+
+  .card__side__other-info {
+    color: #635c77;
+    font-size: 10px;
+    text-align: center;
+    font-family: "Roboto Mono", monospace;
+    position: absolute;
+    bottom: 10px;
+    left: 38px;
+    backface-visibility: hidden;
+  }
+
+  .card__side__debit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 62px;
+    height: 36px;
+    border-radius: 999px;
+    background: #c0c0c0;
+    position: absolute;
+    right: 12px;
+    bottom: 25px;
+    font-family: Inter, sans-serif;
+    color: #666666;
+    font-size: 0.85rem;
+  }
+
+  .card__side__debit::after {
+    content: "";
+    display: block;
+    position: absolute;
+    background: rgba(166,163,163,0.7);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    right: 0;
+    top: -5px;
+  }
+
+  .card:hover .card__side_front {
+    transform: rotateY(180deg);
+  }
+
+  .card:hover .card__side_back {
+    transform: rotateY(0deg);
+  }
+
+  /* small screens */
+  @media (max-width:420px) {
+    .card { width: 240px; height: 170px; }
+    .card__side__photo { width:44px; height:44px; left:10px; bottom:12px; }
+  }
+</style>

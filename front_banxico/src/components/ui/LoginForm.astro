@@ -1,0 +1,173 @@
+---
+import LogoUrl from "../../assets/Banxico_logo.svg?url";
+
+export interface Props {
+  title?: string;
+  subtitle?: string;
+  action?: string;
+}
+
+const t = {
+  title: "Iniciar Sesión",
+  subtitle: "Bienvenido de nuevo — por favor inicie sesión en su cuenta",
+  emailPlaceholder: "Correo electrónico",
+  passwordPlaceholder: "Contraseña",
+  forgotPassword: "¿Olvidaste tu contraseña?",
+  signInButton: "Iniciar Sesión",
+  orSignInWith: "O inicie sesión con",
+  signInWithGoogle: "Iniciar sesión con Google",
+  signInWithApple: "Iniciar sesión con Apple",
+  signInWithTwitter: "Iniciar sesión con Twitter",
+  userLicenseAgreement: "Conozca el acuerdo de licencia de usuario",
+  banxicoLogoAlt: "Logo de Banxico",
+};
+
+const {
+  title = t.title,
+  subtitle = t.subtitle,
+  action = "/api/auth"
+} = Astro.props as Props;
+---
+<div class="u-login-root">
+  <div class="u-login-container">
+    <div class="u-header">
+      <img src={LogoUrl} alt={t.banxicoLogoAlt} class="u-logo" />
+    </div>
+
+    <div class="u-heading">{title}</div>
+    <p class="u-sub">{subtitle}</p>
+
+    <form class="u-form" method="POST" action={action}>
+      <input required class="u-input" type="email" name="email" id="email" placeholder={t.emailPlaceholder} />
+      <input required class="u-input" type="password" name="password" id="password" placeholder={t.passwordPlaceholder} />
+
+      <span class="forgot-password"><a href="/forgot">{t.forgotPassword}</a></span>
+
+      <input class="login-button" type="submit" value={t.signInButton} />
+    </form>
+
+    <div class="social-account-container">
+      <span class="title">{t.orSignInWith}</span>
+      <div class="social-accounts" role="group" aria-label="social logins">
+        <button class="social-button google" aria-label={t.signInWithGoogle} type="button">
+          <!-- svg google -->
+          <svg class="svg" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 488 512" aria-hidden="true">
+            <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"></path>
+          </svg>
+        </button>
+
+        <button class="social-button apple" aria-label={t.signInWithApple} type="button">
+          <!-- svg apple -->
+          <svg class="svg" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512" aria-hidden="true">
+            <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"></path>
+          </svg>
+        </button>
+
+        <button class="social-button twitter" aria-label={t.signInWithTwitter} type="button">
+          <!-- svg twitter (placeholder icon from sample) -->
+          <svg class="svg" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <span class="agreement"><a href="/license">{t.userLicenseAgreement}</a></span>
+  </div>
+</div>
+
+<style>
+  /* Scope with unique prefix to avoid colliding with global utilities */
+  .u-login-root { display:flex; align-items:center; justify-content:center; padding: 2rem; }
+  .u-login-container {
+    max-width: 350px;
+    background: linear-gradient(0deg, rgb(255,255,255) 0%, rgb(244,247,251) 100%);
+    border-radius: 24px;
+    padding: 22px 26px;
+    border: 4px solid rgb(255,255,255);
+    box-shadow: rgba(133,189,215,0.88) 0px 30px 30px -20px;
+    margin: 20px;
+    text-align: center;
+  }
+
+  .u-header { display:flex; justify-content:center; margin-bottom: 6px; }
+  .u-logo { width:92px; height:auto; display:block; margin: 0 auto; }
+
+  .u-heading {
+    font-weight: 900;
+    font-size: 1.6rem;
+    color: var(--color3);
+    margin-top: 6px;
+  }
+  .u-sub {
+    font-size: 0.95rem;
+    margin: 6px 0 12px 0;
+    color: var(--muted);
+  }
+
+  .u-form { margin-top: 6px; display:flex; flex-direction:column; gap:10px; }
+  .u-input {
+    width: 90%;
+    background: white;
+    border: none;
+    padding: 12px 16px;
+    border-radius: 14px;
+    margin-top: 10px;
+    box-shadow: rgba(204,240,255,1) 0px 10px 10px -5px;
+    border-inline: 2px solid transparent;
+    font-size: 0.95rem;
+  }
+  .u-input::placeholder { color: rgb(150,150,150); }
+  .u-input:focus { outline: none; border-inline: 2px solid var(--color4); box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+
+  .forgot-password { display:block; text-align:left; margin-top:6px; margin-left:6px; }
+  .forgot-password a { font-size: 0.85rem; color: var(--color3); text-decoration:none; }
+  .forgot-password a:hover { text-decoration: underline; }
+
+  .login-button {
+    display:block;
+    width:100%;
+    font-weight:700;
+    background: linear-gradient(45deg, var(--color2) 0%, var(--color4) 100%);
+    color: white;
+    padding-block: 12px;
+    margin: 14px auto;
+    border-radius: 14px;
+    box-shadow: rgba(133,189,215,0.88) 0px 20px 10px -15px;
+    border: none;
+    transition: all .18s ease-in-out;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  .login-button:hover { transform: scale(1.03); box-shadow: rgba(133,189,215,0.88) 0px 23px 10px -20px; }
+  .login-button:active { transform: scale(0.98); box-shadow: rgba(133,189,215,0.88) 0px 15px 10px -10px; }
+
+  .social-account-container { margin-top: 12px; }
+  .social-account-container .title { display:block; text-align:center; font-size: 0.78rem; color: rgb(140,140,140); }
+  .social-accounts { width:100%; display:flex; justify-content:center; gap:12px; margin-top:8px; }
+  .social-button {
+    background: linear-gradient(45deg, #000 0%, #707070 100%);
+    border: 5px solid white;
+    padding: 6px;
+    border-radius: 50%;
+    width: 40px;
+    aspect-ratio: 1;
+    display: grid;
+    place-content: center;
+    box-shadow: rgba(133,189,215,0.88) 0px 12px 10px -8px;
+    transition: all .16s ease-in-out;
+    cursor: pointer;
+  }
+  .social-button .svg { fill: white; width:18px; height:18px; display:block; }
+  .social-button:hover { transform: scale(1.14); }
+  .social-button:active { transform: scale(.95); }
+
+  .agreement { display:block; text-align:center; margin-top:12px; }
+  .agreement a { text-decoration:none; color: var(--color3); font-size: 0.82rem; }
+
+  /* responsivo */
+  @media (max-width:480px) {
+    .u-login-container { padding: 16px; border-radius: 18px; }
+    .u-heading { font-size: 1.3rem; }
+  }
+</style>

@@ -1,0 +1,128 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CardView from "../components/ui/CardView.astro";
+import jwt from 'jsonwebtoken';
+import type { JwtPayload } from 'jsonwebtoken';
+
+// 1. Definimos la estructura de los datos que esperamos del backend
+interface Instrumento {
+  idInstrumento: number;
+  tipo: string;
+  descripcion: string;
+  saldoInstrumento: number;
+  fechaRegistro: string;
+  // Añade aquí cualquier otro campo que venga de tu SP
+}
+
+// 2. Hacemos la página dinámica para leer cookies y hacer fetch
+export const prerender = false;
+
+// ❗️ IMPORTANTE: Usa la misma clave secreta que en tu backend
+const SECRET_KEY = 'banxico'; 
+
+// 3. Verificamos la sesión del usuario
+const token = Astro.cookies.get('session')?.value;
+let usuario: (JwtPayload & { id: number, nombre: string, rol: string, correo: string }) | null = null;
+let instrumentos: Instrumento[] = []; // <-- La inicializamos como array vacío
+
+if (token) {
+  try {
+    const decoded = jwt.verify(token, SECRET_KEY) as (JwtPayload & { id: number, nombre: string, rol: string, correo: string });
+    usuario = decoded;
+  } catch (error) {
+    // Si el token es inválido, 'usuario' queda en null
+    console.error("Token inválido o expirado");
+  }
+}
+
+// 4. Si no hay usuario, lo redirigimos al login (página principal)
+if (!usuario) {
+  return Astro.redirect('/');
+}
+
+// 5. Si hay usuario, hacemos el fetch a tu backend
+try {
+  const response = await fetch(`http://localhost:3000/instrumento/${usuario.id}`);
+  
+  if (response.ok) {
+    const data = await response.json(); // Tu backend devuelve el array de instrumentos
+    instrumentos = data; // <-- Reemplazamos el array con los datos reales
+  } else {
+    console.error(`Error ${response.status} al cargar instrumentos.`);
+  }
+} catch (error) {
+  console.error("Error de conexión con el backend (instrumentos):", error.message);
+}
+---
+
+<Layout title="Mis Instrumentos">
+  <div class="container">
+    <h1 class="Texto_Principal">Mis Instrumentos Financieros</h1>
+    <div class="card-grid">
+      {/* 6. Este código .map() ahora funciona con los datos reales.
+        También añadimos un chequeo por si el array viene vacío.
+      */}
+      {instrumentos.length > 0 ? (
+        instrumentos.map((instrumento) => (
+          <CardView width="300px" height="auto">
+            <h2>{instrumento.tipo}</h2>
+            <p>{instrumento.descripcion}</p>
+            <p class="saldo">
+              Saldo: ${instrumento.saldoInstrumento.toLocaleString("es-MX", { // Formato MXN
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </p>
+            <p class="fecha">
+              Registrado el: {new Date(instrumento.fechaRegistro).toLocaleDateString("es-MX")}
+            </p>
+          </CardView>
+        ))
+      ) : (
+        <p>Aún no tienes instrumentos financieros registrados.</p>
+      )}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .container {
+    padding: 2rem;
+    color: black;
+    text-align: center;
+  }
+
+  h1 {
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    justify-items: center;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+    color: #a591ff; /* Un color que resalte del theme */
+    margin-bottom: 1rem;
+  }
+
+  p {
+    margin: 0.5rem 0;
+  }
+
+  .saldo {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #50fa7b; /* Color para el saldo */
+  }
+
+  .fecha {
+    font-size: 0.9rem;
+    color: #bd93f9; /* Color para la fecha */
+  }
+  
+</style>

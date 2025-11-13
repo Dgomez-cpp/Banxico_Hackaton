@@ -1,0 +1,19 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LoginForm from "../components/ui/LoginForm.astro";
+
+// 1. Leer el parámetro de error de la URL
+const error = Astro.url.searchParams.get('error');
+---
+<Layout title="Iniciar Sesión">
+  <main style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 20px); flex-direction: column;">
+    
+    {error && (
+      <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #f5c6cb;">
+        {error}
+      </div>
+    )}
+
+    <LoginForm action="/api/auth" />
+  </main>
+</Layout>

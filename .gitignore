@@ -1,0 +1,37 @@
+# === Dependencias de Node ===
+# Ignora las dependencias de AMBOS proyectos (front y back)
+**/node_modules
+
+# === Archivos de Entorno (¡Crítico!) ===
+# NUNCA subas tus secretos, llaves de API o contraseñas
+.env
+.env.*
+# Mantenemos el archivo de ejemplo para que otros sepan qué variables se necesitan
+!.env.example
+
+# === Frontend: Astro (en /front) ===
+# Archivos de build de Astro
+/front/dist/
+# Archivos de caché y desarrollo de Astro
+/front/.astro/
+
+# === Backend: Express/Node (en /back) ===
+# Si usas TypeScript en el backend, ignora el JS compilado
+/back/dist/
+/back/build/
+
+# === Archivos de Log ===
+# Ignora cualquier archivo de registro
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# === Archivos de Sistema Operativo ===
+.DS_Store
+Thumbs.db
+
+# === Archivos de Editor (Opcional pero recomendado) ===
+# Ignora configuraciones personales de VS Code
+.vscode/
+# Permite compartir extensiones recomendadas
+!.vscode/extensions.json

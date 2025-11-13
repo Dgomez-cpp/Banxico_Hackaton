@@ -1,0 +1,28 @@
+
+/* Paleta */
+.color1 { color: #2b4a7e; }
+.color2 { color: #005a89; }
+.color3 { color: #007698; }
+.color4 { color: #00a0a4; }
+.color5 { color: #00daa5; }
+
+/* Ejemplo de diseño */
+body {
+  background: #f8f9fb;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.button {
+  background: #007698;
+  padding: 12px 18px;
+  color: white;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: #005a89;
+}

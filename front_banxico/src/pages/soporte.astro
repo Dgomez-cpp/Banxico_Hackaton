@@ -1,0 +1,146 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Soporte Banxico">
+  <div class="chat-container">
+    <h1>Chat de Soporte</h1>
+    <div id="chat-window" class="chat-window">
+      <div class="message bot">Hola, ¿en qué puedo ayudarte hoy?</div>
+    </div>
+    <form id="chat-form" class="chat-form">
+      <input type="text" id="message-input" placeholder="Escribe tu mensaje..." autocomplete="off" />
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+</Layout>
+
+<script>
+  // Obtenemos los elementos del DOM
+  const form = document.getElementById('chat-form');
+  const input = document.getElementById('message-input') as HTMLInputElement | null;
+  const chatWindow = document.getElementById('chat-window');
+
+  // Manejador del envío del formulario
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault(); // Evita que la página se recargue
+    const userMessage = input.value;
+    if (!userMessage.trim()) return; // No enviar mensajes vacíos
+    if (!input) return; // Ensure input exists
+    // 1. Muestra el mensaje del usuario
+    addMessageToChat(userMessage, 'user');
+    input.value = ''; // Limpia el input
+
+    // Muestra un indicador de "escribiendo"
+    addMessageToChat('Escribiendo...', 'bot', 'typing-indicator');
+
+    try {
+      // 2. Envía el mensaje al "Puente" (API de Astro)
+      const response = await fetch('/api/chatbot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage })
+      });
+
+      // Quita el indicador de "escribiendo"
+      removeTypingIndicator();
+
+      if (!response.ok) {
+        throw new Error('Error en la respuesta de la API');
+      }
+
+      const data = await response.json(); // { "response": "..." }
+      
+      // 3. Muestra la respuesta del bot
+      addMessageToChat(data.response, 'bot');
+
+    } catch (error) {
+      console.error(error);
+      removeTypingIndicator();
+      addMessageToChat('Error: No se pudo obtener respuesta.', 'bot error');
+    }
+  });
+
+  // --- Funciones de Ayuda ---
+
+  function addMessageToChat(text, sender, id = null) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', sender);
+    if (id) {
+      messageElement.id = id;
+    }
+    if (!chatWindow) return; // Ensure chatWindow exists
+    messageElement.textContent = text;
+    chatWindow.appendChild(messageElement);
+    // Auto-scroll al fondo
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  function removeTypingIndicator() {
+    const indicator = document.getElementById('typing-indicator');
+    if (indicator) {
+      indicator.remove();
+    }
+  }
+</script>
+
+<style>
+  .chat-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 70vh;
+  }
+  h1 { text-align: center; color: black; }
+  .chat-window {
+    flex-grow: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background: #f9f9f9;
+    color: black;
+  }
+  .message {
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    max-width: 80%;
+  }
+  .message.user {
+    background-color: #007bff;
+    color: white;
+    margin-left: auto;
+    align-self: flex-end;
+  }
+  .message.bot {
+    background-color: #e9e9e9;
+    color: #333;
+    align-self: flex-start;
+  }
+  .message.bot.error {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  .chat-form {
+    display: flex;
+    padding: 1rem;
+    border-top: 1px solid #ddd;
+  }
+  #message-input {
+    flex-grow: 1;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  button {
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+</style>
